@@ -3,16 +3,29 @@ import net.dv8tion.jda.api.AccountType;
 //import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 public class Main extends ListenerAdapter {
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) throws LoginException, IOException {
         JDABuilder builder = new JDABuilder(AccountType.BOT);
-        String token = "NzQxNzg1NTEzNTgwNjkxNDY3.Xy8nmA.MXz0M7282QlyxIVCZdmt9uXGlIQ";
+        String homeDir = System.getProperty("user.home");
+        String token = readFile(homeDir + "/.JDA/token", StandardCharsets.UTF_8);;
         builder.setToken(token);
         builder.addEventListeners(new Main());
         builder.build();
+    }
+
+    public static String readFile(String path, Charset encoding) throws IOException {
+        String content = Files.lines(Paths.get(path), encoding)
+                .collect(Collectors.joining(System.lineSeparator()));
+
+        return content;
     }
 
    @Override
