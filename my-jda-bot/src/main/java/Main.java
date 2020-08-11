@@ -12,13 +12,20 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 public class Main extends ListenerAdapter {
+    static String[] ADJ;
+    static String[] FOOD;
+
     public static void main(String[] args) throws LoginException, IOException {
         JDABuilder builder = new JDABuilder(AccountType.BOT);
         String homeDir = System.getProperty("user.home");
-        String token = readFile(homeDir + "/.JDA/token", StandardCharsets.UTF_8);;
+        String token = readFile(homeDir + "/.JDA/token", StandardCharsets.UTF_8);
+        FOOD = readFile(homeDir +"/.JDA/food", StandardCharsets.UTF_8).split(",");
+        ADJ = readFile(homeDir + "/.JDA/adj", StandardCharsets.UTF_8).split(",");
         builder.setToken(token);
         builder.addEventListeners(new Main());
         builder.build();
+
+
     }
 
     public static String readFile(String path, Charset encoding) throws IOException {
@@ -42,13 +49,11 @@ public class Main extends ListenerAdapter {
     }
 
     public String makeName() {
-        String[] adj = {"attractive","bald","beautiful","chubby","clean","dazzling","drab","elegant","fancy","fit","flabby","glamorous","gorgeous","handsome","long","magnificent","muscular","plain","plump","quaint","scruffy","shapely","short","skinny","stocky","ugly","unkempt","unsightly"};
-        String[] food = {"apple", "avocado", "almond", "anchovy", "aniseed","asparagus","banana","blueberries", "blackberries", "biscuits","bhaji","beans","cake","crisps", "curry", "carrot", "coconut","cookie", "dates", "damson jam", "dried fruit", "doughnut", "doner meat", "egg", "eggplant" , "enchilada" , "egg fried rice", "fish", "fizzy drink", "figs", "fruit salad", "fruit" ,"fruit cake"};
-        int a = (int)(Math.random() * adj.length);
-        int f = (int)(Math.random() * food.length);
+        int a = (int)(Math.random() * ADJ.length);
+        int f = (int)(Math.random() * FOOD.length);
 
-        String name = adj[a] + " " + food[f];
-
+        String name = ADJ[a] + " " + FOOD[f];
+        name.toLowerCase();
         return name;
     }
 }
