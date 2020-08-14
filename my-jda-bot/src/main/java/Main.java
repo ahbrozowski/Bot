@@ -41,6 +41,7 @@ public class Main extends ListenerAdapter {
    @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         boolean used = false;
+        boolean stop = false;
        if (!add) {
            System.out.println("We received a message from " +
                    event.getAuthor().getName() + ":" +
@@ -72,45 +73,52 @@ public class Main extends ListenerAdapter {
                }
            }
            if (event.getAuthor().getName().equals(author)) {
-               String homeDir = System.getProperty("user.home");
-               String word = "," + event.getMessage().getContentRaw();
-               if(adj) {
-                   for (String s : ADJ) {
-                       if (event.getMessage().getContentRaw().equals(s)) {
-                           used = true;
-                       }
-                   }
-               } if(!adj){
-                   for (String s : FOOD) {
-                       if (event.getMessage().getContentRaw().equals(s)) {
-                           used = true;
-                       }
-                   }
+               if (event.getMessage().getContentRaw().equals("!cancel")) {
+                   stop = true;
                }
-               if(!used) {
-                   String path = "";
-                   if(adj) {
-                       path = "/.JDA/adj";
-                   } else {
-                       path = "/.JDA/food";
+               if (!stop) {
+                   String homeDir = System.getProperty("user.home");
+                   String word = "," + event.getMessage().getContentRaw();
+                   if (adj) {
+                       for (String s : ADJ) {
+                           if (event.getMessage().getContentRaw().toLowerCase().equals(s.toLowerCase())) {
+                               used = true;
+                           }
+                       }
                    }
+                   if (!adj) {
+                       for (String s : FOOD) {
+                           if (event.getMessage().getContentRaw().toLowerCase().equals(s.toLowerCase())) {
+                               used = true;
+                           }
+                       }
+                   }
+                   if (!used) {
+                       String path = "";
+                       if (adj) {
+                           path = "/.JDA/adj";
+                       } else {
+                           path = "/.JDA/food";
+                       }
 
-                   try {
-                       Files.write(Paths.get(homeDir + path), word.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-                   } catch (IOException e) {
-                       e.printStackTrace();
+                       try {
+                           Files.write(Paths.get(homeDir + path), word.toLowerCase().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+                       } catch (IOException e) {
+                           e.printStackTrace();
+                       }
+                       try {
+                           loadFiles();
+                       } catch (IOException e) {
+                           e.printStackTrace();
+                       }
+                       event.getChannel().sendMessage("Added!").queue();
+                   } else {
+                       event.getChannel().sendMessage("Oops that is already in my code!").queue();
+                       used = false;
                    }
-                   try {
-                       loadFiles();
-                   } catch (IOException e) {
-                       e.printStackTrace();
-                   }
-                   event.getChannel().sendMessage("Added!").queue();
-               } else {
-                   event.getChannel().sendMessage("Oops that is already in my code!").queue();
-                   used = false;
                }
                add = false;
+               stop = false;
            }
        }
    }
